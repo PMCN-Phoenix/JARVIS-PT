@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "command": "echo \"[$(date -Iseconds)] PostToolUse\" >> .claude/activity.log 2>/dev/null || echo \"[%DATE%] PostToolUse\" >> .claude/activity.log"
+      }
+    ]
+  }
+}
