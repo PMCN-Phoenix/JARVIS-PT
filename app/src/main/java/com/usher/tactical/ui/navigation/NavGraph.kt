@@ -67,7 +67,7 @@ fun NavGraph(navController: NavHostController) {
             startDestination = Routes.DASHBOARD,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Routes.DASHBOARD) { DashboardScreen() }
+            composable(Routes.DASHBOARD) { DashboardScreen(navController = navController) }
             composable(Routes.ATTRIBUTE) { AttributeScreen() }
             composable(Routes.TASK) { TaskCenterScreen() }
             composable(Routes.BACKPACK) { BackpackScreen() }
