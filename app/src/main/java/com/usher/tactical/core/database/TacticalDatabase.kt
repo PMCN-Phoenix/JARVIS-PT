@@ -36,7 +36,7 @@ import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
         LockStatusEntity::class,
         SystemLogEntity::class
     ],
-    version = 1,
+    version = 2,  // +3 default daily tasks
     exportSchema = false
 )
 abstract class TacticalDatabase : RoomDatabase() {
@@ -124,6 +124,29 @@ abstract class TacticalDatabase : RoomDatabase() {
                         db.execSQL(
                             "INSERT OR IGNORE INTO lock_status (hostId, disqualificationCounter, isLocked, lastSettlement) " +
                             "VALUES ('usher', 0, 0, $now)"
+                        )
+
+                        // 预置默认日常任务（数值型/百分比型/时间型）
+                        db.execSQL(
+                            "INSERT OR IGNORE INTO task (id, hostId, type, name, requirementJson, rewardJson, status, orderIndex, createdAt, updatedAt) " +
+                            "VALUES ('task_daily_1', 'usher', 'daily', '基础训练', " +
+                            "'{\"type\":\"numeric\",\"target\":100,\"unit\":\"次\"}', " +
+                            "'[{\"type\":\"universal_exp\",\"amount\":10},{\"type\":\"attribute\",\"name\":\"力量\",\"amount\":0.05}]', " +
+                            "'active', 0.0, $now, $now)"
+                        )
+                        db.execSQL(
+                            "INSERT OR IGNORE INTO task (id, hostId, type, name, requirementJson, rewardJson, status, orderIndex, createdAt, updatedAt) " +
+                            "VALUES ('task_daily_2', 'usher', 'daily', '枪械校准', " +
+                            "'{\"type\":\"percentage\",\"unit\":\"%\"}', " +
+                            "'[{\"type\":\"hidden_exp\",\"amount\":5}]', " +
+                            "'active', 1.0, $now, $now)"
+                        )
+                        db.execSQL(
+                            "INSERT OR IGNORE INTO task (id, hostId, type, name, requirementJson, rewardJson, status, orderIndex, createdAt, updatedAt) " +
+                            "VALUES ('task_daily_3', 'usher', 'daily', '状态维护', " +
+                            "'{\"type\":\"duration\",\"target\":60,\"unit\":\"分钟\"}', " +
+                            "'[{\"type\":\"universal_exp\",\"amount\":5},{\"type\":\"attribute\",\"name\":\"体力\",\"amount\":0.03}]', " +
+                            "'active', 2.0, $now, $now)"
                         )
 
                         // 预置一条系统日志

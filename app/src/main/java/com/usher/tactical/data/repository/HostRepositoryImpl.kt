@@ -50,6 +50,10 @@ class HostRepositoryImpl @Inject constructor(
     override fun observeSystemLogsByCategory(category: String): Flow<List<SystemLog>> =
         systemLogDao.observeByCategory(category).map { list -> list.map { it.toDomain() } }
 
+    override suspend fun getLockStatus(): LockStatus? {
+        return lockStatusDao.get()?.let { LockStatus(it.disqualificationCounter, it.isLocked, it.lastSettlement) }
+    }
+
     override suspend fun updateAttribute(attr: HostAttribute) {
         attributeDao.upsert(HostAttributeEntity(
             id = attr.id,
@@ -59,6 +63,10 @@ class HostRepositoryImpl @Inject constructor(
             detailsJson = attr.detailsJson,
             updatedAt = System.currentTimeMillis()
         ))
+    }
+
+    override suspend fun addAttributeValue(attrName: String, delta: Float) {
+        attributeDao.addValue(attrName, delta)
     }
 
     override suspend fun addResourceAmount(type: String, delta: Float) {

@@ -17,8 +17,10 @@ interface HostRepository {
     fun observeSystemLogsByCategory(category: String): Flow<List<SystemLog>>
 
     suspend fun updateAttribute(attr: HostAttribute)
+    suspend fun addAttributeValue(attrName: String, delta: Float)
     suspend fun addResourceAmount(type: String, delta: Float)
     suspend fun updateLockCounter(counter: Int)
     suspend fun setLocked(locked: Boolean)
+    suspend fun getLockStatus(): LockStatus?
     suspend fun insertSystemLog(level: String, category: String, message: String)
 }

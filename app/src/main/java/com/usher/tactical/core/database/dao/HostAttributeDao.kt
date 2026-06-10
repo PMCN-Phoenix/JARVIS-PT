@@ -18,6 +18,9 @@ interface HostAttributeDao {
     @Query("SELECT * FROM host_attribute WHERE hostId = 'usher' AND category = :category")
     suspend fun getByCategory(category: String): List<HostAttributeEntity>
 
+    @Query("UPDATE host_attribute SET value = value + :delta, updatedAt = :now WHERE hostId = 'usher' AND attrName = :attrName")
+    suspend fun addValue(attrName: String, delta: Float, now: Long = System.currentTimeMillis())
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(attr: HostAttributeEntity)
 
