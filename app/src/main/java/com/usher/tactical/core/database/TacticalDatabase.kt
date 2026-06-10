@@ -36,7 +36,7 @@ import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
         LockStatusEntity::class,
         SystemLogEntity::class
     ],
-    version = 2,  // +3 default daily tasks
+    version = 3,  // +demo main quest
     exportSchema = false
 )
 abstract class TacticalDatabase : RoomDatabase() {
@@ -148,6 +148,27 @@ abstract class TacticalDatabase : RoomDatabase() {
                             "'[{\"type\":\"universal_exp\",\"amount\":5},{\"type\":\"attribute\",\"name\":\"体力\",\"amount\":0.03}]', " +
                             "'active', 2.0, $now, $now)"
                         )
+
+                        // 预置一条演示主线任务（铁幕 + 3个子目标）
+                        db.execSQL(
+                            "INSERT OR IGNORE INTO task (id, hostId, type, name, requirementJson, rewardJson, status, orderIndex, createdAt, updatedAt) " +
+                            "VALUES ('main_demo', 'usher', 'main', '主线·铁幕', " +
+                            "'{\"type\":\"main\"}', " +
+                            "'[{\"type\":\"universal_exp\",\"amount\":100},{\"type\":\"potential_point\",\"amount\":1},{\"type\":\"specialty_point\",\"amount\":1}]', " +
+                            "'active', 0.0, $now, $now)"
+                        )
+                        val subGoals = listOf(
+                            Triple("sub_1", "完成1次基因优化", 0f),
+                            Triple("sub_2", "建立声望≥2的个人势力", 1f),
+                            Triple("sub_3", "完成1次大型遗迹探险", 2f)
+                        )
+                        subGoals.forEach { (id, name, order) ->
+                            db.execSQL(
+                                "INSERT OR IGNORE INTO task (id, hostId, parentId, type, name, requirementJson, rewardJson, status, orderIndex, createdAt, updatedAt) " +
+                                "VALUES ('$id', 'usher', 'main_demo', 'main_sub', '$name', " +
+                                "'{\"type\":\"numeric\",\"target\":1,\"unit\":\"次\"}', '[]', 'active', $order, $now, $now)"
+                            )
+                        }
 
                         // 预置一条系统日志
                         db.execSQL(

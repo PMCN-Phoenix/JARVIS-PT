@@ -11,12 +11,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class DashboardState(
     val host: Host? = null,
     val attributes: List<HostAttribute> = emptyList(),
+    val resources: List<com.usher.tactical.domain.model.Resource> = emptyList(),
+    val systemLogs: List<com.usher.tactical.domain.model.SystemLog> = emptyList(),
     val lockStatus: LockStatus? = null,
     val isLoading: Boolean = true
 ) {
@@ -39,15 +42,33 @@ class HostViewModel @Inject constructor(
             combine(
                 hostRepository.observeHost(),
                 hostRepository.observeAttributes(),
-                hostRepository.observeLockStatus()
-            ) { host, attrs, lock ->
+                hostRepository.observeResources(),
+                hostRepository.observeLockStatus(),
+                hostRepository.observeSystemLogs()
+            ) { host, attrs, resources, lock, logs ->
                 DashboardState(
                     host = host,
                     attributes = attrs,
+                    resources = resources,
+                    systemLogs = logs,
                     lockStatus = lock,
                     isLoading = false
                 )
             }.collect { _state.value = it }
         }
+    }
+
+    fun triggerLock() {
+        viewModelScope.launch {
+            hostRepository.setLocked(true)
+            hostRepository.insertSystemLog("error", "penalty", "用户手动触发系统锁死。")
+        }
+    }
+
+    suspend fun resetAll() {
+        // Clear and reinitialize — handled by database destructive migration on next version bump
+        hostRepository.setLocked(false)
+        hostRepository.updateLockCounter(0)
+        hostRepository.insertSystemLog("info", "system", "系统完全重置。")
     }
 }

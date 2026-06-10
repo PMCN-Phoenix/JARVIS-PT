@@ -22,5 +22,7 @@ interface HostRepository {
     suspend fun updateLockCounter(counter: Int)
     suspend fun setLocked(locked: Boolean)
     suspend fun getLockStatus(): LockStatus?
+    suspend fun getResourceByType(type: String): Resource?
+    suspend fun getAttributesByCategory(category: String): List<HostAttribute>
     suspend fun insertSystemLog(level: String, category: String, message: String)
 }

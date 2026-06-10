@@ -49,6 +49,10 @@ class TaskViewModel @Inject constructor(
         }
     }
 
+    fun createTask(task: Task) {
+        viewModelScope.launch { taskRepository.createTask(task) }
+    }
+
     fun checkIn(taskId: String, evidence: String) {
         viewModelScope.launch {
             val task = taskRepository.getTaskById(taskId) ?: return@launch

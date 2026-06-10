@@ -1,5 +1,7 @@
 package com.usher.tactical.ui.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Dashboard
@@ -31,8 +33,10 @@ import androidx.navigation.compose.rememberNavController
 import com.usher.tactical.ui.attribute.AttributeScreen
 import com.usher.tactical.ui.backpack.BackpackScreen
 import com.usher.tactical.ui.dashboard.DashboardScreen
+import com.usher.tactical.ui.lock.LockScreen
 import com.usher.tactical.ui.log.SystemLogScreen
 import com.usher.tactical.ui.task.TaskCenterScreen
+import com.usher.tactical.ui.task.TaskConfigScreen
 
 object Routes {
     const val DASHBOARD = "dashboard"
@@ -62,17 +66,22 @@ fun NavGraph(navController: NavHostController) {
     Scaffold(
         bottomBar = { TacticalBottomBar(navController) }
     ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Routes.DASHBOARD,
-            modifier = Modifier.padding(innerPadding)
+        Box(modifier = Modifier.fillMaxSize()) {
+            NavHost(
+                navController = navController,
+                startDestination = Routes.DASHBOARD,
+                modifier = Modifier.padding(innerPadding)
         ) {
             composable(Routes.DASHBOARD) { DashboardScreen(navController = navController) }
             composable(Routes.ATTRIBUTE) { AttributeScreen() }
-            composable(Routes.TASK) { TaskCenterScreen() }
+            composable(Routes.TASK) { TaskCenterScreen(navController = navController) }
+            composable("task_config") { TaskConfigScreen(navController = navController) }
             composable(Routes.BACKPACK) { BackpackScreen() }
             composable(Routes.LOG) { SystemLogScreen() }
         }
+        // 锁死覆盖层
+        LockScreen()
+    }
     }
 }
 

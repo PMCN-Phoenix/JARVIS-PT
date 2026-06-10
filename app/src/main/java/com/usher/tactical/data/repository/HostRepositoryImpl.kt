@@ -54,6 +54,14 @@ class HostRepositoryImpl @Inject constructor(
         return lockStatusDao.get()?.let { LockStatus(it.disqualificationCounter, it.isLocked, it.lastSettlement) }
     }
 
+    override suspend fun getResourceByType(type: String): Resource? {
+        return resourceDao.getByType(type)?.let { Resource(it.id, it.type, it.amount) }
+    }
+
+    override suspend fun getAttributesByCategory(category: String): List<HostAttribute> {
+        return attributeDao.getByCategory(category).map { it.toDomain() }
+    }
+
     override suspend fun updateAttribute(attr: HostAttribute) {
         attributeDao.upsert(HostAttributeEntity(
             id = attr.id,
